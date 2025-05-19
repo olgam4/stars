@@ -1,4 +1,4 @@
-import app/context.{type Context}
+import context/base.{type Context}
 import app/datastar_utils
 import app/router/auth
 import app/router/protected.{protected_route}
@@ -23,7 +23,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
     ["heartbeat"] -> heartbeat()
-    ["login"] -> login_page(req)
+    ["login"] -> login_page(req, ctx)
     ["sse"] -> sse_page(req, ctx)
     ["api", "component"] -> component(req, ctx)
     ["api", "user"] -> user.user_router(req, ctx)
@@ -45,11 +45,11 @@ fn sse_page(req, ctx) {
   use <- wisp.require_method(req, Get)
   use <- protected_route(req, ctx)
 
-  let index = index.index(sse_view.body)
+  let index = index.index(sse_view.body, ctx)
   wisp.html_response(string_tree.from_string(index), 200)
 }
 
-fn component(req, ctx: context.Context) {
+fn component(req, ctx) {
   use <- protected_route(req, ctx)
 
   let pubsub = ctx.pubsub
@@ -73,13 +73,13 @@ fn home_page(req, ctx) {
   use <- wisp.require_method(req, Get)
   use <- protected_route(req, ctx)
 
-  let index = index.index(home.body)
+  let index = index.index(home.body, ctx)
   wisp.html_response(string_tree.from_string(index), 200)
 }
 
-fn login_page(req) {
+fn login_page(req, ctx) {
   use <- wisp.require_method(req, Get)
 
-  let index = index.index(login.login)
+  let index = index.index(login.login, ctx)
   wisp.html_response(string_tree.from_string(index), 200)
 }

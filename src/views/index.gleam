@@ -1,13 +1,12 @@
+import context/base.{type Context}
 import nakai
 import nakai/attr
 import nakai/html
 
-const csrf_token = "68M7_Q89mS6nuG7L1X2ZwBrWVUT72Y4d"
-
-pub fn index(children) {
+pub fn index(children, ctx: Context) {
   html.Html([attr.lang("fr-CA")], [
     html.Head([
-      html.meta([attr.name("csrf-token"), attr.content(csrf_token)]),
+      html.meta([attr.name("csrf-token"), attr.content(ctx.csrf_token)]),
       html.meta([
         attr.name("viewport"),
         attr.content("width=device-width, initial-scale=1.0"),

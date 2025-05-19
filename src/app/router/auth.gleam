@@ -1,4 +1,3 @@
-import dotenv_conf
 import datastar_wisp
 import datastar
 import gleam/json
@@ -6,18 +5,15 @@ import gwt
 import domain/session
 import gleam/time/duration
 import gleam/time/timestamp
-import glanoid
 import argus
 import gleam/result
 import gleam/bool
 import gleam/list
 import wisp
-import app/context
+import context/base.{type Context}
 import gleam/http.{Post}
 
-const cookie_name = "__Stars_id"
-
-pub fn login(req, ctx: context.Context) {
+pub fn login(req, ctx: Context) {
   use <- wisp.require_method(req, Post)
   use formdata <- wisp.require_form(req)
   let assert Ok(username) = list.key_find(formdata.values, "username")
@@ -37,8 +33,7 @@ pub fn login(req, ctx: context.Context) {
   let assert Ok(result) = argus.verify(credentials.hash, password)
   use <- bool.guard(!result, return: wisp.not_found())
 
-  let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
-  let session_id = nanoid(10)
+  let session_id = ctx.nanoid(12)
 
   let expires_at =
     timestamp.system_time()
@@ -53,13 +48,10 @@ pub fn login(req, ctx: context.Context) {
       "",
     ))
 
-  use env <- dotenv_conf.read_file(".env")
-  let secret_key = dotenv_conf.read_string_or("SECRET_KEY", env, "secret")
-
   let jwt =
     gwt.new()
     |> gwt.set_payload_claim("session_id", json.string(session_id))
-    |> gwt.to_signed_string(gwt.HS512, secret_key)
+    |> gwt.to_signed_string(gwt.HS512, ctx.secret_key)
 
   let events = [
     datastar.execute_script("window.location='/'")
@@ -67,6 +59,6 @@ pub fn login(req, ctx: context.Context) {
   ]
 
   wisp.ok()
-  |> wisp.set_cookie(req, cookie_name, jwt, wisp.Signed, 60 * 60 * 24)
+  |> wisp.set_cookie(req, ctx.cookie_name, jwt, wisp.Signed, 60 * 60 * 24)
   |> datastar_wisp.send(events)
 }

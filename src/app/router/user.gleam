@@ -1,9 +1,8 @@
-import app/context
+import context/base.{type Context}
 import app/router/protected.{protected_route}
 import argus
 import domain/credentials
 import domain/user
-import glanoid
 import gleam/bool
 import gleam/dynamic/decode
 import gleam/http.{Get, Post}
@@ -12,7 +11,7 @@ import gleam/list
 import gleam/result
 import wisp
 
-pub fn user_router(req: wisp.Request, ctx: context.Context) {
+pub fn user_router(req: wisp.Request, ctx: Context) {
   case req.method {
     Get -> get_user(req, ctx)
     Post -> create_user(req, ctx)
@@ -30,7 +29,7 @@ fn user_creation_decoder() -> decode.Decoder(UserCreation) {
   decode.success(UserCreation(name, password))
 }
 
-fn create_user(req, ctx: context.Context) {
+fn create_user(req, ctx: Context) {
   use <- wisp.require_method(req, Post)
   use <- protected_route(req, ctx)
   use json <- wisp.require_json(req)
@@ -39,8 +38,7 @@ fn create_user(req, ctx: context.Context) {
   use <- bool.guard(result.is_error(user_creation), return: wisp.bad_request())
   let assert Ok(UserCreation(name, password)) = user_creation
 
-  let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
-  let id = nanoid(12)
+  let id = ctx.nanoid(12)
   let user = user.User(id, name)
 
   let assert Ok(hashes) =
@@ -56,7 +54,7 @@ fn create_user(req, ctx: context.Context) {
   |> wisp.string_body(id)
 }
 
-fn get_user(req, ctx: context.Context) {
+fn get_user(req, ctx: Context) {
   use <- wisp.require_method(req, Get)
   use <- protected_route(req, ctx)
 
