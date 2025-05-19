@@ -1,13 +1,1 @@
-const originalFetch = window.fetch;
-window.fetch = function(input, init = {}) {
-  const { method } = init
-  
-  if ((/^(GET|HEAD|OPTIONS)$/.test(method))) return originalFetch(input, init);
-
-  const value = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-  init.headers = {
-    ...init.headers,
-    'X-Csrf-Token': value
-  };
-  return originalFetch(input, init);
-};
+const originalFetch=window.fetch;window.fetch=function(e,t={}){const{method:n}=t;if(/^(GET|HEAD|OPTIONS)$/.test(n))return originalFetch(e,t);const o=document.querySelector('meta[name="csrf-token"]').getAttribute("content");return t.headers={...t.headers,"X-Csrf-Token":o},originalFetch(e,t)};
