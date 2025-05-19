@@ -1,0 +1,23 @@
+meta {
+  name: create user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/api/user
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "allo",
+    "password": "password"
+  }
+}
+
+script:post-response {
+  const user_id = res.getBody()
+  bru.setVar("user_id", user_id);
+}

@@ -1,0 +1,8 @@
+.DS_Store
+*.beam
+*.ez
+*.csv
+/build
+erl_crash.dump
+/node_modules
+.env

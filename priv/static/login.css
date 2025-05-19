@@ -1,0 +1,100 @@
+.login {
+    position: absolute;
+    inset: 0;
+    align-content: center;
+    justify-items: center;
+    background-image: linear-gradient(#c8caff 1px, transparent 1px), linear-gradient(to right, #c8caff 1px, transparent 1px);
+    background-size: 128px 128px;
+    background-color: #fbfeff;
+    animation: scroll 180s linear infinite;
+}
+
+@keyframes scroll {
+    0% {
+        background-position-x: 0%;
+        background-position-y: 0%;
+    }
+
+    100% {
+        background-position-x: 100%;
+        background-position-y: 300%;
+    }
+}
+
+.container {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.31);
+    backdrop-filter: blur(7px);
+}
+
+.container:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    padding: 2px;
+    pointer-events: none;
+    background: linear-gradient(135deg,
+            rgb(153, 153, 223),
+            rgba(158, 158, 170, 0.492));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+}
+
+h1 {
+    position: absolute;
+    text-transform: uppercase;
+    font-size: xx-large;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    left: 1ch;
+    top: -1.4lh;
+    color: #0008ff;
+}
+
+form {
+    color: black;
+    padding-inline: 50px;
+    padding-block:5px;
+    margin-top: 30px;
+
+    label {
+        display: grid;
+        grid-template-columns: 10ch 1fr;
+
+        input {
+            background: none;
+            border: none;
+            color: black;
+        }
+    }
+
+    .actions {
+        button {
+            display: flex;
+            justify-content: center;
+            color: #0008ff;
+            border-radius: 8px;
+            width: 4ch;
+            margin-left: auto;
+            margin-top: 10px;
+
+            &:hover {
+                scale: 1.05;
+            }
+
+            transition: scale 200ms;
+        }
+    }
+}
