@@ -42,7 +42,6 @@ fn heartbeat() {
 }
 
 fn sse_page(req, ctx) {
-
   use <- wisp.require_method(req, Get)
   use <- protected_route(req, ctx)
 

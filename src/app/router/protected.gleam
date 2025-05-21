@@ -6,8 +6,7 @@ import views/index
 import wisp.{type Response}
 
 pub fn protected_route(req, ctx: Context, next: fn() -> Response) -> Response {
-  let is_authorized =
-    auth.check_cookies(req, wisp.get_secret_key_base(req), ctx)
+  let is_authorized = auth.check_cookies(req, ctx)
 
   let index = index.index(home.redirect_to_login, ctx)
   case is_authorized {

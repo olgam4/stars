@@ -1,3 +1,4 @@
+import wisp
 import gleam/erlang/process
 import domain/pubsub.{type PubSubMessage}
 import domain/credentials
@@ -22,4 +23,9 @@ pub type Context {
     cookie_name: String,
     secret_key_base: String,
   )
+}
+
+pub fn static_directory() -> String {
+  let assert Ok(priv_directory) = wisp.priv_directory("stars")
+  priv_directory <> "/static"
 }

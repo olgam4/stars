@@ -16,13 +16,11 @@ pub fn pubsub_loop(message: PubSubMessage, clients: List(Subject(String))) {
     Subscribe(client) -> {
       [client, ..clients] |> actor.continue
     }
-
     Unsubscribe(client) -> {
       clients
       |> list.filter(fn(c) { c != client })
       |> actor.continue
     }
-
     Publish(message) -> {
       clients |> list.each(process.send(_, message))
       clients |> actor.continue
@@ -34,7 +32,7 @@ pub fn sse_handler(req, ctx: Context) {
   let is_authorized = auth.check_cookies(req, ctx)
 
   use _ <- given.ok(is_authorized, fn(_) {
-    response.new(403)
+    response.new(400)
     |> response.set_body(mist.Bytes(bytes_tree.new()))
   })
 

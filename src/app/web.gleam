@@ -22,7 +22,6 @@ pub fn middleware(
   use <- add_cache_to_styles(req)
   use <- add_cache_to_lib(req)
 
-
   handle_request(req)
 }
 
