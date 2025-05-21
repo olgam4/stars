@@ -13,6 +13,7 @@ pub fn middleware(
   handle_request: fn(wisp.Request) -> wisp.Response,
 ) -> wisp.Response {
   let req = wisp.method_override(req)
+  use <- wisp.serve_static(req, under: "/static", from: ctx.static_directory)
   use <- wisp.log_request(req)
   use <- wisp.rescue_crashes
   use req <- wisp.handle_head(req)
@@ -21,7 +22,6 @@ pub fn middleware(
   use <- add_cache_to_styles(req)
   use <- add_cache_to_lib(req)
 
-  use <- wisp.serve_static(req, under: "/static", from: ctx.static_directory)
 
   handle_request(req)
 }

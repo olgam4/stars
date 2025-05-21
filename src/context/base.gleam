@@ -1,5 +1,5 @@
 import gleam/erlang/process
-import app/sse
+import domain/pubsub.{type PubSubMessage}
 import domain/credentials
 import domain/session
 import domain/user
@@ -14,7 +14,7 @@ pub type Context {
     session_repository: session.Repository,
     credentials_repository: credentials.Repository,
 
-    pubsub: process.Subject(sse.PubSubMessage),
+    pubsub: process.Subject(PubSubMessage),
     nanoid: fn(Int) -> String,
 
     secret_key: String,

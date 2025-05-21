@@ -1,3 +1,4 @@
+import wisp
 import glanoid
 import app/sse
 import gleam/otp/actor
@@ -6,6 +7,12 @@ import infra/session
 import infra/user
 import context/base.{Context}
 import dotenv_conf as env
+
+
+fn static_directory() -> String {
+  let assert Ok(priv_directory) = wisp.priv_directory("stars")
+  priv_directory <> "/static"
+}
 
 pub fn get_dev_context() {
   use file <- env.read_file(".env")
@@ -20,7 +27,7 @@ pub fn get_dev_context() {
   Context(
     ip: ip,
     port: port,
-    static_directory: "./static",
+    static_directory: static_directory(),
     user_repository: user.get_file_repository(),
     session_repository: session.get_file_repository(),
     credentials_repository: credentials.get_file_repository(),
@@ -32,3 +39,4 @@ pub fn get_dev_context() {
   )
   
 }
+

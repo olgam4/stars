@@ -1,3 +1,8 @@
+import app/auth
+import context/base.{type Context}
+import domain/pubsub.{type PubSubMessage, Publish, Subscribe, Unsubscribe}
+import given
+import gleam/bytes_tree
 import gleam/erlang/process.{type Subject}
 import gleam/function
 import gleam/http/response
@@ -6,44 +11,39 @@ import gleam/otp/actor
 import gleam/string_tree
 import mist
 
-pub type PubSubMessage {
-  /// A new client has connected and wants to receive messages.
-  Subscribe(client: Subject(String))
-  /// A client has disconnected and should no longer receive messages.
-  Unsubscribe(client: Subject(String))
-  /// A message to forward to all connected clients.
-  Publish(String)
-}
-
 pub fn pubsub_loop(message: PubSubMessage, clients: List(Subject(String))) {
   case message {
     Subscribe(client) -> {
-      echo "➕ Client connected"
       [client, ..clients] |> actor.continue
     }
 
     Unsubscribe(client) -> {
-      echo "➖ Client disconnected"
       clients
       |> list.filter(fn(c) { c != client })
       |> actor.continue
     }
 
     Publish(message) -> {
-      echo "💬 " <> message
       clients |> list.each(process.send(_, message))
       clients |> actor.continue
     }
   }
 }
 
-pub fn sse_handler(req, pubsub) {
+pub fn sse_handler(req, ctx: Context, secret_key_base: String) {
+  let is_authorized = auth.check_cookies(req, secret_key_base, ctx)
+
+  use _ <- given.ok(is_authorized, fn(_) {
+    response.new(403)
+    |> response.set_body(mist.Bytes(bytes_tree.new()))
+  })
+
   mist.server_sent_events(
     req,
     response.new(200),
     init: fn() {
       let client = process.new_subject()
-      process.send(pubsub, Subscribe(client))
+      process.send(ctx.pubsub, Subscribe(client))
       let selector =
         process.new_selector()
         |> process.selecting(client, function.identity)
@@ -61,7 +61,7 @@ pub fn sse_handler(req, pubsub) {
       {
         Ok(_) -> actor.continue(client)
         Error(_) -> {
-          process.send(pubsub, Unsubscribe(client))
+          process.send(ctx.pubsub, Unsubscribe(client))
           actor.Stop(process.Normal)
         }
       }

@@ -16,7 +16,7 @@ pub fn main() -> Nil {
   let assert Ok(_) =
     mist.new(fn(req) {
       case request.path_segments(req) {
-        ["api", "events"] -> sse.sse_handler(req, ctx.pubsub)
+        ["api", "events"] -> sse.sse_handler(req, ctx, secret_key_base)
         _ -> wisp_mist.handler(handler, secret_key_base)(req)
       }
     })
@@ -25,9 +25,4 @@ pub fn main() -> Nil {
     |> mist.start_http
 
   process.sleep_forever()
-}
-
-pub fn static_directory() -> String {
-  let assert Ok(priv_directory) = wisp.priv_directory("stars")
-  priv_directory <> "/static"
 }

@@ -3,7 +3,7 @@ import app/datastar_utils
 import app/router/auth
 import app/router/protected.{protected_route}
 import app/router/user
-import app/sse
+import domain/pubsub
 import app/web
 import datastar
 import gleam/erlang/process
@@ -63,7 +63,7 @@ fn component(req, ctx) {
     |> datastar.events_to_string
     |> datastar_utils.sanitize
 
-  let message = sse.Publish(events)
+  let message = pubsub.Publish(events)
   process.send(pubsub, message)
 
   wisp.ok()
