@@ -9,6 +9,7 @@ import wisp/wisp_mist
 
 pub fn main() -> Nil {
   wisp.configure_logger()
+
   let ctx = dev.get_dev_context()
   let handler = router.handle_request(_, ctx)
 

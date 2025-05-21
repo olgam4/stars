@@ -11,7 +11,13 @@ pub fn index(children, ctx: Context) {
         attr.name("viewport"),
         attr.content("width=device-width, initial-scale=1.0"),
       ]),
-      html.meta([attr.http_equiv("Content-Security-Policy"), attr.content("default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'")]),
+      html.meta([
+        attr.http_equiv("Content-Security-Policy"),
+        attr.content(
+          "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+        ),
+      ]),
+      html.link([attr.rel("icon"), attr.href("/static/favicon.ico")]),
       html.link([attr.rel("stylesheet"), attr.href("/static/reset.css")]),
       html.link([attr.rel("stylesheet"), attr.href("/static/open-props.css")]),
       html.link([attr.rel("stylesheet"), attr.href("/static/icons.css")]),

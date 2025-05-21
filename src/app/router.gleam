@@ -62,6 +62,8 @@ fn component(req, ctx) {
   let event = pubsub.DSEvent(pubsub.EventMergeFragment, events)
 
   let message = pubsub.Publish(event)
+
+  process.send(pubsub, message)
   process.send(pubsub, message)
 
   wisp.ok()
