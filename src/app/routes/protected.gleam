@@ -1,4 +1,4 @@
-import app/auth
+import app/tools/auth
 import context/base.{type Context}
 import gleam/string_tree
 import views/components/home

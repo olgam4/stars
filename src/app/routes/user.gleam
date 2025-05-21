@@ -1,4 +1,4 @@
-import app/router/protected.{protected_route}
+import app/routes/protected.{protected_route}
 import argus
 import context/base.{type Context}
 import domain/credentials
