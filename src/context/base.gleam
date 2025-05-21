@@ -20,5 +20,6 @@ pub type Context {
     secret_key: String,
     csrf_token: String,
     cookie_name: String,
+    secret_key_base: String,
   )
 }

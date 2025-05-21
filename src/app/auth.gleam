@@ -16,12 +16,12 @@ fn verify_signed_message(
   crypto.verify_signed_message(message, <<secret_key_base:utf8>>)
 }
 
-pub fn check_cookies(req, secret_key_base: String, ctx: Context) {
+pub fn check_cookies(req, ctx: Context) {
   let cookies = request.get_cookies(req)
   use token <- result.try(
     list.key_find(cookies, ctx.cookie_name) |> result.replace_error(Nil),
   )
-  use value <- result.try(verify_signed_message(secret_key_base, token))
+  use value <- result.try(verify_signed_message(ctx.secret_key_base, token))
   use cookie <- result.try(bit_array.to_string(value))
 
   use jwt <- result.try(

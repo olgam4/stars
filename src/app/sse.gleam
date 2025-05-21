@@ -30,8 +30,8 @@ pub fn pubsub_loop(message: PubSubMessage, clients: List(Subject(String))) {
   }
 }
 
-pub fn sse_handler(req, ctx: Context, secret_key_base: String) {
-  let is_authorized = auth.check_cookies(req, secret_key_base, ctx)
+pub fn sse_handler(req, ctx: Context) {
+  let is_authorized = auth.check_cookies(req, ctx)
 
   use _ <- given.ok(is_authorized, fn(_) {
     response.new(403)

@@ -23,6 +23,7 @@ pub fn get_dev_context() {
   let assert Ok(pubsub) = actor.start([], sse.pubsub_loop)
   let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
   let cookie_name = "__Stars_id"
+  let secret_key_base = wisp.random_string(64)
 
   Context(
     ip: ip,
@@ -35,7 +36,8 @@ pub fn get_dev_context() {
     nanoid: nanoid,
     secret_key: secret_key,
     csrf_token: csrf_token,
-    cookie_name: cookie_name
+    cookie_name: cookie_name,
+    secret_key_base: secret_key_base,
   )
   
 }
