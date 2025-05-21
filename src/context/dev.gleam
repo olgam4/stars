@@ -1,6 +1,6 @@
+import domain/pubsub
 import wisp
 import glanoid
-import app/sse
 import gleam/otp/actor
 import infra/credentials
 import infra/session
@@ -14,7 +14,7 @@ pub fn get_dev_context() {
   let port = env.read_int_or("PORT", file, 8080)
   let secret_key = env.read_string_or("SECRET_KEY", file, "secret")
   let csrf_token = env.read_string_or("CSRF_TOKEN", file, "secret")
-  let assert Ok(pubsub) = actor.start([], sse.pubsub_loop)
+  let assert Ok(pubsub) = actor.start([], pubsub.pubsub_loop)
   let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
   let cookie_name = "__Stars_id"
   let secret_key_base = wisp.random_string(64)
@@ -33,6 +33,4 @@ pub fn get_dev_context() {
     cookie_name: cookie_name,
     secret_key_base: secret_key_base,
   )
-  
 }
-

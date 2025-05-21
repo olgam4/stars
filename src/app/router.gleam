@@ -1,11 +1,10 @@
-import context/base.{type Context}
-import app/datastar_utils
 import app/router/auth
 import app/router/protected.{protected_route}
 import app/router/user
-import domain/pubsub
 import app/web
+import context/base.{type Context}
 import datastar
+import domain/pubsub
 import gleam/erlang/process
 import gleam/http.{Get}
 import gleam/string_tree
@@ -53,17 +52,16 @@ fn component(req, ctx) {
   use <- protected_route(req, ctx)
 
   let pubsub = ctx.pubsub
-  let events =
-    [
-      datastar.merge_fragments("<div>Hello</div>")
-      |> datastar.merge_fragments_selector("#mama")
-      |> datastar.merge_fragments_merge_mode(datastar.Append)
-      |> datastar.merge_fragments_end(),
-    ]
-    |> datastar.events_to_string
-    |> datastar_utils.sanitize
+  let events = [
+    datastar.merge_fragments("<div>Hello</div>")
+    |> datastar.merge_fragments_selector("#mama")
+    |> datastar.merge_fragments_merge_mode(datastar.Append)
+    |> datastar.merge_fragments_end(),
+  ]
 
-  let message = pubsub.Publish(events)
+  let event = pubsub.DSEvent(pubsub.EventMergeFragment, events)
+
+  let message = pubsub.Publish(event)
   process.send(pubsub, message)
 
   wisp.ok()

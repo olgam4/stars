@@ -1,32 +1,14 @@
 import app/auth
+import app/datastar_utils
 import context/base.{type Context}
-import domain/pubsub.{type PubSubMessage, Publish, Subscribe, Unsubscribe}
+import domain/pubsub.{Subscribe, Unsubscribe}
 import given
 import gleam/bytes_tree
-import gleam/erlang/process.{type Subject}
+import gleam/erlang/process
 import gleam/function
 import gleam/http/response
-import gleam/list
 import gleam/otp/actor
-import gleam/string_tree
 import mist
-
-pub fn pubsub_loop(message: PubSubMessage, clients: List(Subject(String))) {
-  case message {
-    Subscribe(client) -> {
-      [client, ..clients] |> actor.continue
-    }
-    Unsubscribe(client) -> {
-      clients
-      |> list.filter(fn(c) { c != client })
-      |> actor.continue
-    }
-    Publish(message) -> {
-      clients |> list.each(process.send(_, message))
-      clients |> actor.continue
-    }
-  }
-}
 
 pub fn sse_handler(req, ctx: Context) {
   let is_authorized = auth.check_cookies(req, ctx)
@@ -48,15 +30,8 @@ pub fn sse_handler(req, ctx: Context) {
       actor.Ready(client, selector)
     },
     loop: fn(message, conn, client) {
-      case
-        mist.send_event(
-          conn,
-          message
-            |> string_tree.from_string
-            |> mist.event
-            |> mist.event_name("datastar-merge-fragments"),
-        )
-      {
+      let data = message |> datastar_utils.from_datastar_events_to_mist_event
+      case mist.send_event(conn, data) {
         Ok(_) -> actor.continue(client)
         Error(_) -> {
           process.send(ctx.pubsub, Unsubscribe(client))

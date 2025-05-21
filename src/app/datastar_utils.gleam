@@ -1,7 +1,11 @@
+import datastar
+import domain/pubsub
 import gleam/list
 import gleam/string
+import gleam/string_tree
+import mist
 
-pub fn sanitize(s: String) -> String {
+fn sanitize(s: String) -> String {
   s
   |> strip_first_word_from_every_line
   |> remove_first_line
@@ -38,4 +42,27 @@ fn strip_first_word_from_every_line(s: String) -> String {
       }
     })
   string.join(stripped_lines, "\n")
+}
+
+fn events_to_string(events: List(datastar.Event)) -> String {
+  events
+  |> datastar.events_to_string
+  |> sanitize
+}
+
+pub fn from_datastar_events_to_mist_event(
+  ds_event: pubsub.DSEvent,
+) -> mist.SSEEvent {
+  let data =
+    ds_event.data
+    |> events_to_string
+    |> string_tree.from_string
+    |> mist.event
+  case ds_event.event {
+    pubsub.EventExecuteScript -> mist.event_name(data, "datastar-execute-script")
+    pubsub.EventMergeFragment -> mist.event_name(data, "datastar-merge-fragments")
+    pubsub.EventMergeSignals -> mist.event_name(data, "datastar-merge-signals")
+    pubsub.EventRemoveFragments -> mist.event_name(data, "datastar-remove-fragments")
+    pubsub.EventRemoveSignals -> mist.event_name(data, "datastar-remove-signals")
+  }
 }
