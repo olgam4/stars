@@ -1,17 +1,17 @@
-import datastar_wisp
+import argus
+import context/base.{type Context}
 import datastar
-import gleam/json
-import gwt
+import datastar_wisp
 import domain/session
+import given
+import gleam/bool
+import gleam/http.{Post}
+import gleam/json
+import gleam/list
 import gleam/time/duration
 import gleam/time/timestamp
-import argus
-import gleam/result
-import gleam/bool
-import gleam/list
+import gwt
 import wisp
-import context/base.{type Context}
-import gleam/http.{Post}
 
 pub fn login(req, ctx: Context) {
   use <- wisp.require_method(req, Post)
@@ -19,16 +19,15 @@ pub fn login(req, ctx: Context) {
   let assert Ok(username) = list.key_find(formdata.values, "username")
   let assert Ok(password) = list.key_find(formdata.values, "password")
 
-  let maybe_user = ctx.user_repository.get_by_name(username)
-  use <- bool.guard(result.is_error(maybe_user), return: wisp.not_found())
-  let assert Ok(user) = maybe_user
-
-  let maybe_credentials = ctx.credentials_repository.get(user.id)
-  use <- bool.guard(
-    result.is_error(maybe_credentials),
-    return: wisp.not_found(),
+  use user <- given.ok(
+    ctx.user_repository.get_by_name(username),
+    fn(_) { wisp.not_found() },
   )
-  let assert Ok(credentials) = maybe_credentials
+
+  use credentials <- given.ok(
+    ctx.credentials_repository.get(user.id),
+    fn(_) { wisp.not_found() },
+  )
 
   let assert Ok(result) = argus.verify(credentials.hash, password)
   use <- bool.guard(!result, return: wisp.not_found())

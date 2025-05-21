@@ -1,14 +1,13 @@
-import context/base.{type Context}
 import app/router/protected.{protected_route}
 import argus
+import context/base.{type Context}
 import domain/credentials
 import domain/user
-import gleam/bool
+import given
 import gleam/dynamic/decode
 import gleam/http.{Get, Post}
 import gleam/json
 import gleam/list
-import gleam/result
 import wisp
 
 pub fn user_router(req: wisp.Request, ctx: Context) {
@@ -34,9 +33,10 @@ fn create_user(req, ctx: Context) {
   use <- protected_route(req, ctx)
   use json <- wisp.require_json(req)
 
-  let user_creation = decode.run(json, user_creation_decoder())
-  use <- bool.guard(result.is_error(user_creation), return: wisp.bad_request())
-  let assert Ok(UserCreation(name, password)) = user_creation
+  use UserCreation(name, password) <- given.ok(
+    decode.run(json, user_creation_decoder()),
+    fn(_) { wisp.bad_request() },
+  )
 
   let id = ctx.nanoid(12)
   let user = user.User(id, name)
