@@ -1,5 +1,5 @@
-import app/auth
-import app/datastar_utils
+import app/tools/auth
+import app/tools/datastar_utils
 import context/base.{type Context}
 import domain/pubsub.{Subscribe, Unsubscribe}
 import given

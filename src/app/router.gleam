@@ -1,6 +1,6 @@
-import app/router/auth
-import app/router/protected.{protected_route}
-import app/router/user
+import app/routes/auth
+import app/routes/protected.{protected_route}
+import app/routes/user
 import app/web
 import context/base.{type Context}
 import datastar
